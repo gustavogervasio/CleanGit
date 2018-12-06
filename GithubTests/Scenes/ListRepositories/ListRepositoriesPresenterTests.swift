@@ -22,7 +22,7 @@ class ListRepositoriesPresenterTests: XCTestCase {
 
         var displayFetchedRepositoriesCalled = false
 
-        func displayFetchedRepositories(viewModel: ListRepositories.ViewModel) {
+        func displayFetchedRepositories(repositories: [RepositorieModel]) {
             displayFetchedRepositoriesCalled = true
         }
     }

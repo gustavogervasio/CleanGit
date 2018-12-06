@@ -3,7 +3,10 @@ import UIKit
 
 struct R {
 
-    struct string {}
+    struct string {
+        static let listRepositoriesTitle = "Repositories"
+        static let showRepositorieTitle = "Details"
+    }
 
     struct color {
         static let c_45_45_45 = UIColor(r: 45, g: 45, b: 45)
@@ -17,7 +20,9 @@ struct R {
         static let b14 = UIFont.boldSystemFont(ofSize: 14)
     }
 
-    struct image {}
+    struct image {
+        static let github = UIImage(named: "github-light")
+    }
 
     struct url {
         static let mobile = URL(string: "https://api.github.com")!

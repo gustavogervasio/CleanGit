@@ -5,7 +5,8 @@ class ListRepositoriesInteractorTests: XCTestCase {
 
     // MARK: Test
     func testFetchRepositoriesShouldAskWorkerToFetchRepositories() {
-        let sut = ListRepositoriesInteractor()
+        let presenter = ListRepositoriesPresentationLogicSpy()
+        let sut = ListRepositoriesInteractor(presenter: presenter)
         let worker = ListRepositoriesWorkerSpy()
         sut.worker = worker
         
@@ -17,10 +18,8 @@ class ListRepositoriesInteractorTests: XCTestCase {
     }
 
     func testFetchRepositoriesShouldAskPresenterToFormatRepositories() {
-        let sut = ListRepositoriesInteractor()
-        
         let presenter = ListRepositoriesPresentationLogicSpy()
-        sut.presenter = presenter
+        let sut = ListRepositoriesInteractor(presenter: presenter)
         
         let worker = ListRepositoriesWorkerSpy()
         sut.worker = worker

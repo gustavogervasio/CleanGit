@@ -10,15 +10,20 @@ protocol ListRepositoriesDataStore {
 
 class ListRepositoriesInteractor: ListRepositoriesBusinessLogic, ListRepositoriesDataStore {
 
-    var presenter: ListRepositoriesPresentationLogic?
+    private var presenter: ListRepositoriesPresentationLogic
     var worker: ListRepositoriesWorkerProtocol = ListRepositoriesWorker()
     var repositories: [RepositorieModel]?
+
+    // MARK: Init
+    init(presenter: ListRepositoriesPresentationLogic) {
+        self.presenter = presenter
+    }
 
     // MARK: Public Methods (ListRepositoriesBusinessLogic)
     func fetchRepositories() {
         worker.fetch(completionHandler: { [weak self] (repositories) in
             self?.repositories = repositories
-            self?.presenter?.presentFetchedRepositories(response: repositories)
+            self?.presenter.presentFetchedRepositories(response: repositories)
         })
     }
 }

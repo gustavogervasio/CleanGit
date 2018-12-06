@@ -1,18 +1,25 @@
 import UIKit
 
 protocol ListRepositoriesDisplayLogic: class {
-    func displayFetchedRepositories(viewModel: ListRepositories.ViewModel)
+    func displayFetchedRepositories(repositories: [RepositorieModel])
+}
+
+protocol ListRepositoriesViewControllerDelegate {
+    func listRepositoriesViewController(controller: ListRepositoriesViewController, didTapRepositorie repositorie: RepositorieModel)
 }
 
 class ListRepositoriesViewController: TableViewController, ListRepositoriesDisplayLogic {
 
-    private var interactor: ListRepositoriesBusinessLogic?
-    private var router: (NSObjectProtocol & ListRepositoriesRoutingLogic & ListRepositoriesDataPassing)?
-    
+    var interactor: ListRepositoriesBusinessLogic?
+    private var displayedRepositories: [RepositorieModel] = []
+    private let delegate: ListRepositoriesViewControllerDelegate
+
     // MARK: Init
-    override init(title: String) {
+    init(title: String, delegate: ListRepositoriesViewControllerDelegate) {
+        self.delegate = delegate
         super.init(title: title)
         setup()
+        setupTableViewCells()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -30,17 +37,16 @@ class ListRepositoriesViewController: TableViewController, ListRepositoriesDispl
     }
 
     // MARK: Private Methods
-        private func setup() {
+    private func setup() {
         let viewController = self
-        let interactor = ListRepositoriesInteractor()
         let presenter = ListRepositoriesPresenter()
-        let router = ListRepositoriesRouter()
+        let interactor = ListRepositoriesInteractor(presenter: presenter)
         viewController.interactor = interactor
-        viewController.router = router
-        interactor.presenter = presenter
         presenter.viewController = viewController
-        router.viewController = viewController
-        router.dataStore = interactor
+    }
+
+    private func setupTableViewCells() {
+        tableView.register(RepositorieCell.self, forCellReuseIdentifier: RepositorieCell.identifier)
     }
 
     private func fetchRepositories() {
@@ -51,8 +57,27 @@ class ListRepositoriesViewController: TableViewController, ListRepositoriesDispl
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {}
     
     // MARK: Public Methods (ListRepositoriesDisplayLogic)
-    func displayFetchedRepositories(viewModel: ListRepositories.ViewModel) {
+    func displayFetchedRepositories(repositories: [RepositorieModel]) {
+        displayedRepositories = repositories
+        tableView.reloadData()
+    }
 
-        print(viewModel)
+    // MARK: TableView
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return displayedRepositories.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let displayedRepositorie = displayedRepositories[indexPath.row]
+
+        let cell = tableView.dequeueReusableCell(withIdentifier: RepositorieCell.identifier, for: indexPath) as! RepositorieCell
+        cell.bindView(name: displayedRepositorie.name, description: displayedRepositorie.fullName)
+        return cell
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        super.tableView(tableView, didSelectRowAt: indexPath)
+        delegate.listRepositoriesViewController(controller: self, didTapRepositorie: displayedRepositories[indexPath.row])
     }
 }
